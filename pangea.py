@@ -12,6 +12,7 @@ logging.basicConfig(level = logging.INFO)
 app = typer.Typer()
 
 DEFAULT_PANGEA_CREDENTIALS_PATH = f"{os.getenv('HOME')}/.pangea/credentials"
+DEFAULT_PANGEA_CACHE_PATH = f"{os.getenv('HOME')}/.pangea/path_cache.json"
 
 @app.command()
 def setup():
@@ -44,6 +45,34 @@ def _get_pangea_token() -> str:
     f.close()
     return pangea_token
 
+def _set_local_secrets_path(path: str, secrets_dir: str):
+    # Write the directory to load secrets from
+    # Open ~/.pangea/path_cache.json
+    # Check if file exists
+    if not os.path.isfile(DEFAULT_PANGEA_CACHE_PATH):
+        # Create new file
+        f = open(DEFAULT_PANGEA_CACHE_PATH, "w")
+        f.write("{}")
+        f.close()
+    
+    # Read the file
+    f = open(DEFAULT_PANGEA_CACHE_PATH, "r")
+    # Check if errors opening file
+    if (f == None):
+        print("Error opening file")
+        raise typer.Exit(code=1)
+    path_cache = f.read()
+    f.close()
+    # Load the json
+    import json
+    path_cache_json = json.loads(path_cache)
+    # Set the path
+    path_cache_json[path] = secrets_dir
+    # Write the file
+    f = open(DEFAULT_PANGEA_CACHE_PATH, "w")
+    f.write(json.dumps(path_cache_json))
+    f.close()
+
 def _list_secrets(folder_name, vault):
     return vault.list(
         filter={
@@ -57,22 +86,49 @@ def select(folder_name: str = "/secrets"):
     vault: Vault = Vault(token=pangea_token)
 
     print(f"List of secrets from {folder_name}")
-    list_secrets = _list_secrets(folder_name, vault)
+    list_secrets = _list_secrets(f"/secrets/{folder_name}", vault)
     for result in list_secrets.result.items:
         if result.type == "folder":
             print(f"📂 {result.type} {result.name}")
         elif result.type == "secret":
-            print(f"🔐 {result.type} {result.id}")
+            print(f"🔐 {result.type} {result.name}")
 
     proceed = inquirer.confirm(message="Do you want to load these secrets for your app?", default=True).execute()
 
     if proceed:
+        # Get current directory
+        current_dir = os.getcwd()
+        _set_local_secrets_path(current_dir, f"/secrets/{folder_name}")
         print("✨ Done loading secrets. Start your application with `pangea run -c app_name`")
 
 # @app.command()
 # def run(c: str = typer.Argument("", metavar="-c/--command", help="Command to run your application. Eg: `python main.py`")):
 #     print(f"✨ Running {c}")
 
+def _get_secrets_dir_from_cache():
+    current_dir = os.getcwd()
+    # Check if current directory is in cache
+    if not os.path.isfile(DEFAULT_PANGEA_CACHE_PATH):
+        logging.info("❌ No secrets loaded. Run `pangea select` to load secrets")
+        raise typer.Exit(code=1)
+    
+    # Read the file
+    f = open(DEFAULT_PANGEA_CACHE_PATH, "r")
+    # Check if errors opening file
+    if (f == None):
+        print("Error opening file")
+        raise typer.Exit(code=1)
+    path_cache = f.read()
+    f.close()
+    # Load the json
+    import json
+    path_cache_json = json.loads(path_cache)
+    # Set the path
+    if current_dir not in path_cache_json:
+        logging.info("❌ No secrets loaded. Run `pangea select` to load secrets")
+        raise typer.Exit(code=1)
+
+    return path_cache_json[current_dir]
 
 @app.command()
 def run(
@@ -81,7 +137,8 @@ def run(
     # prepend environment secrets from pangea
     pangea_token = _get_pangea_token()
     vault: Vault = Vault(token=pangea_token)
-    secret_list = _list_secrets("/secrets/project1", vault)
+    secrets_dir = _get_secrets_dir_from_cache()
+    secret_list = _list_secrets(secrets_dir, vault)
     secret_value_list = {}
     for result in secret_list.result.items:
         if result.type == "secret":
