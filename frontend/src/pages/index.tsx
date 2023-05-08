@@ -41,7 +41,7 @@ export default function Home() {
                   type="text"
                   disabled
                   value="NEXT_PUBLIC_SUPER_SECRET_KEY"
-                  className="block w-96 rounded-md border-0 py-1.5 px-1.5 text-gray-900 dark:text-gray-200 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  className="block w-96 rounded-md border-0 py-1.5 px-1.5 text-gray-900 dark:text-gray-700 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
               </div>
           </div>
@@ -59,7 +59,7 @@ export default function Home() {
                   type="secret_value"
                   value={process.env.NEXT_PUBLIC_SUPER_SECRET_KEY}
                   disabled
-                  className="block w-96 rounded-md border-0 py-1.5 px-1.5 text-gray-900 dark:text-gray-200 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  className="block w-96 rounded-md border-0 py-1.5 px-1.5 text-gray-900 dark:text-gray-700 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
               </div>
             </div>

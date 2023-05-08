@@ -165,6 +165,3 @@ def run(
     # Print the output and error
     if len(stdout.decode('utf-8')) > 0: logging.info(stdout.decode('utf-8'))
     if len(stderr.decode('utf-8')) > 0: logging.error(stderr.decode('utf-8'))
-
-if __name__ == "__main__":
-    app()

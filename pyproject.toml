@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "secrets-cli"
+version = "0.1.0"
+authors = ["Pranav"]
+description = "Run any applications with secrets stored in the Pangea Vault"
+
+
+[tool.poetry.dependencies]
+python = ">=3.7.2,<4.0"
+typer = {version = "0.9.0", extras = ["all"]}
+pangea-sdk = "1.8.0"
+InquirerPy = "0.3.4"
+
+[tool.poetry.scripts]
+pangea = 'secrets_cli.secrets_cli:app'
