@@ -99,7 +99,7 @@ def select(folder_name: str = "/secrets"):
         # Get current directory
         current_dir = os.getcwd()
         _set_local_secrets_path(current_dir, f"/secrets/{folder_name}")
-        print("✨ Done loading secrets. Start your application with `pangea run -c app_name`")
+        print("✨ Done loading secrets. Start your application with `pangea run app_name`")
 
 # @app.command()
 # def run(c: str = typer.Argument("", metavar="-c/--command", help="Command to run your application. Eg: `python main.py`")):
@@ -152,16 +152,18 @@ def run(
             secret_value_list[result.name] = secret.result.current_version.secret
 
     # Prepend secret_value_list to command list
-    import subprocess
+    import subprocess, sys
 
     # Execute the command
     process_env = os.environ.copy()
     process_env.update(secret_value_list)
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=process_env)
 
-    # Get the output and error
-    stdout, stderr = process.communicate()
+    # Relay output and error back to host process
+    for line in iter(process.stdout.readline, b''):
+        sys.stdout.write(line.decode('utf-8'))
+    for line in iter(process.stderr.readline, b''):
+        sys.stderr.write(line.decode('utf-8'))
 
-    # Print the output and error
-    if len(stdout.decode('utf-8')) > 0: logging.info(stdout.decode('utf-8'))
-    if len(stderr.decode('utf-8')) > 0: logging.error(stderr.decode('utf-8'))
+    # Wait for the subprocess to finish
+    process.wait()
