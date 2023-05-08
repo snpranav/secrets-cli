@@ -27,7 +27,7 @@ export default function Home() {
       </div>
 
       <div className="container flex flex-col place-items-center my-auto before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full  before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700/10 after:dark:from-sky-900 after:dark:via-[#0141ff]/40 before:lg:h-[360px]">
-        <h1 className='text-6xl font-bold  text-center py-2'>Secret Keys Loaded into Your Runtime {process.env.NEXT_PUBLIC_EMOJI}</h1>
+        <h1 className='text-6xl font-bold  text-center py-2'>Secret Keys Loaded into Your Runtime 🤫</h1>
         <p className='text-lg font-light shrink  text-center py-8'>The secrets-cli tool pulls your secrets from the super-secure Pangea vault and loads it into the runtime environment.<br />No need to worry the headache of managing env files or integrate any other SDKs</p>
         <div className='grid md:grid-cols-2 grid-cols-1 gap-4'>
           <div>

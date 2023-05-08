@@ -35,14 +35,18 @@ def setup():
     print(f"✅ Setup Complete. Credentials saved to ~/.pangea/credentials")
 
 def _get_pangea_token() -> str:
-    # Read the token from a ~/.pangea/credentials file
-    f = open(DEFAULT_PANGEA_CREDENTIALS_PATH, "r")
-    # Check if errors opening file
-    if (f == None):
-        print("Error opening file")
-        raise typer.Exit(code=1)
-    pangea_token = f.read()
-    f.close()
+    if (not os.getenv('PANGEA_TOKEN')):
+        # Read the token from a ~/.pangea/credentials file
+        f = open(DEFAULT_PANGEA_CREDENTIALS_PATH, "r")
+        # Check if errors opening file
+        if (f == None):
+            print("Error opening file")
+            raise typer.Exit(code=1)
+        pangea_token = f.read()
+        f.close()
+    else:
+        pangea_token = os.getenv('PANGEA_TOKEN')
+
     return pangea_token
 
 def _set_local_secrets_path(path: str, secrets_dir: str):
@@ -106,29 +110,32 @@ def select(folder_name: str = "/secrets"):
 #     print(f"✨ Running {c}")
 
 def _get_secrets_dir_from_cache():
-    current_dir = os.getcwd()
-    # Check if current directory is in cache
-    if not os.path.isfile(DEFAULT_PANGEA_CACHE_PATH):
-        logging.info("❌ No secrets loaded. Run `pangea select` to load secrets")
-        raise typer.Exit(code=1)
-    
-    # Read the file
-    f = open(DEFAULT_PANGEA_CACHE_PATH, "r")
-    # Check if errors opening file
-    if (f == None):
-        print("Error opening file")
-        raise typer.Exit(code=1)
-    path_cache = f.read()
-    f.close()
-    # Load the json
-    import json
-    path_cache_json = json.loads(path_cache)
-    # Set the path
-    if current_dir not in path_cache_json:
-        logging.info("❌ No secrets loaded. Run `pangea select` to load secrets")
-        raise typer.Exit(code=1)
+    if (not os.getenv('PANGEA_SECRETS_DIR')):
+        current_dir = os.getcwd()
+        # Check if current directory is in cache
+        if not os.path.isfile(DEFAULT_PANGEA_CACHE_PATH):
+            logging.info("❌ No secrets loaded. Run `pangea select` to load secrets")
+            raise typer.Exit(code=1)
+        
+        # Read the file
+        f = open(DEFAULT_PANGEA_CACHE_PATH, "r")
+        # Check if errors opening file
+        if (f == None):
+            print("Error opening file")
+            raise typer.Exit(code=1)
+        path_cache = f.read()
+        f.close()
+        # Load the json
+        import json
+        path_cache_json = json.loads(path_cache)
+        # Set the path
+        if current_dir not in path_cache_json:
+            logging.info("❌ No secrets loaded. Run `pangea select` to load secrets")
+            raise typer.Exit(code=1)
 
-    return path_cache_json[current_dir]
+        return path_cache_json[current_dir]
+    else:
+        return f"/secrets/{os.getenv('PANGEA_SECRETS_DIR')}"
 
 @app.command()
 def run(

@@ -1,8 +1,9 @@
 [tool.poetry]
 name = "secrets-cli"
-version = "0.1.0"
+version = "0.1.3"
 authors = ["Pranav"]
 description = "Run any applications with secrets stored in the Pangea Vault"
+readme = "Readme.md"
 
 
 [tool.poetry.dependencies]
